@@ -1,4 +1,4 @@
-package com.parkmate.notification_service;
+package com.parkmate.notificationservice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
