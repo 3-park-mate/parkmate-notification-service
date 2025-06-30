@@ -9,6 +9,8 @@ import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
 import com.parkmate.notificationservice.notificationsender.NotificationSender;
 import com.parkmate.notificationservice.usertoken.application.UserTokenService;
+import io.github.bucket4j.Bucket;
+import io.github.bucket4j.ConsumptionProbe;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -22,10 +24,18 @@ import java.util.concurrent.CompletableFuture;
 public class FCMService implements NotificationSender {
 
     private final UserTokenService userTokenService;
+    private final Bucket fcmRateLimitBucket;
 
     @Async("fcmThreadPool")
     @Override
     public CompletableFuture<Void> send(com.parkmate.notificationservice.notification.domain.Notification notification) {
+
+        // Rate Limiting 체크
+        ConsumptionProbe probe = fcmRateLimitBucket.tryConsumeAndReturnRemaining(1);
+        if (!probe.isConsumed()) {
+            log.warn("FCM rate limit exceeded for notification: {}", notification.getId());
+            return CompletableFuture.completedFuture(null);
+        }
 
         String receiver = notification.getReceiverUuid();
         String title = notification.getTitle();

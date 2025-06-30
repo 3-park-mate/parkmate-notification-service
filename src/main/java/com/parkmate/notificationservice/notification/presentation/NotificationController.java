@@ -12,6 +12,7 @@ import com.parkmate.notificationservice.notification.dto.response.NotificationRe
 import com.parkmate.notificationservice.notification.vo.request.NotificationsGetRequestVo;
 import com.parkmate.notificationservice.notification.vo.response.NotificationReadResponseVo;
 import com.parkmate.notificationservice.notification.vo.response.NotificationResponseVo;
+import io.micrometer.core.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +43,7 @@ public class NotificationController {
             tags = {"NOTIFICATION-SERVICE"}
     )
     @GetMapping("/{receiverType}")
+    @Timed(value = "notification.get.list", description = "알림 목록 조회 시간")
     public ApiResponse<CursorPage<NotificationResponseVo>> getUserNotifications(
             @PathVariable String receiverType,
             @ModelAttribute NotificationsGetRequestVo notificationsGetRequestVo,
@@ -67,6 +69,7 @@ public class NotificationController {
             tags = {"NOTIFICATION-SERVICE"}
     )
     @PatchMapping("/{notificationId}/{receiverType}")
+    @Timed(value = "notification.read", description = "알림 읽음 처리 시간")
     public ApiResponse<NotificationReadResponseVo> readNotificationById(@PathVariable String notificationId,
                                                                         @PathVariable String receiverType,
                                                                         HttpServletRequest request) {
@@ -89,6 +92,7 @@ public class NotificationController {
                     """,
             tags = {"NOTIFICATION-SERVICE"}
     )
+    @Timed(value = "notification.delete", description = "알림 삭제 시간")
     public ApiResponse<Void> deleteNotificationById(@PathVariable String notificationId,
                                                     @PathVariable String receiverType,
                                                     HttpServletRequest request) {
@@ -110,6 +114,7 @@ public class NotificationController {
                     """,
             tags = {"NOTIFICATION-SERVICE"}
     )
+    @Timed(value = "notification.unread.count", description = "읽지 않은 알림 개수 조회 시간")
     public ApiResponse<Long> getUnreadNotificationCount(
             @PathVariable String receiverType,
             HttpServletRequest request) {
